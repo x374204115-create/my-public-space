@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="My Public Space is an online art gallery with original works and limited prints from independent artists. Browse the works or submit your own.">
+<meta property="og:title" content="My Public Space">
+<meta property="og:description" content="An online art gallery with original works and limited prints from independent artists.">
+<meta property="og:type" content="website">
+<style>body{margin:0}</style>
+<title>My Public Space</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap">
+<style>
+/* Layout: gallery wall. Slim header, split hero with three stacked works, a grid of catalogue cards,
+   then an artists' call, about, and contact. Artwork covers are drawn in SVG so no image files are needed.
+   TEMPLATE NOTE: artworks, artist names and prices are samples. Replace them with real pieces. */
+:root {
+  --bg: #f4f4f1;
+  --surface: #e8e8e3;
+  --fg: #15151b;
+  --muted: #595962;
+  --line: #d2d2ca;
+  --accent: #2a3dff;
+  --on-accent: #ffffff;
+  --font-display: "Syne", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e0e12; --surface: #18181f; --fg: #ececf1; --muted: #a0a0ad;
+    --line: #2a2a34; --accent: #8c97ff; --on-accent: #0c0c18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e0e12; --surface: #18181f; --fg: #ececf1; --muted: #a0a0ad;
+  --line: #2a2a34; --accent: #8c97ff; --on-accent: #0c0c18;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 40px;
+}
+h1, h2, h3 { font-family: var(--font-display); margin: 0; line-height: 1.05; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 1120px; margin-inline: auto; }
+.mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+
+/* header */
+header { padding-block: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 24px; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 20px; text-decoration: none; letter-spacing: -0.01em; }
+nav { display: flex; flex-wrap: wrap; gap: 4px 22px; font-size: 15px; font-weight: 500; }
+nav a { text-decoration: none; color: var(--muted); padding-block: 4px; }
+nav a:hover { color: var(--fg); }
+
+/* hero */
+.hero { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; padding-block: 40px 72px; align-items: center; }
+.hero > * { min-width: 0; }
+.hero h1 { font-size: clamp(42px, 8vw, 88px); font-weight: 800; letter-spacing: -0.03em; margin-block: 14px 20px; }
+.hero .lede { font-size: 19px; color: var(--muted); max-width: 44ch; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.btn { display: inline-block; padding: 13px 22px; border-radius: 4px; font: 700 15px var(--font-body); text-decoration: none; border: 2px solid var(--accent); cursor: pointer; }
+.btn.primary { background: var(--accent); color: var(--on-accent); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.small { padding: 9px 14px; font-size: 14px; }
+.btn:hover { border-color: var(--accent); }
+
+.stack { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 14px; }
+.stack .art:first-child { grid-row: span 2; }
+.art { position: relative; overflow: hidden; background: var(--surface); aspect-ratio: 4 / 5; max-width: 100%; }
+.art svg { display: block; width: 100%; height: 100%; }
+.stack .art:first-child { aspect-ratio: auto; min-height: 100%; }
+.stack .art:not(:first-child) { aspect-ratio: 1 / 1; }
+
+/* sections */
+section { padding-block: 64px; border-top: 1px solid var(--line); }
+.head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; margin-bottom: 32px; }
+.head h2 { font-size: clamp(30px, 5vw, 52px); font-weight: 800; letter-spacing: -0.02em; margin-top: 10px; max-width: 16ch; }
+.head p { color: var(--muted); max-width: 40ch; }
+
+.works { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 40px 24px; }
+.work { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.work .meta { display: grid; gap: 4px; }
+.work h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.work .by { color: var(--muted); font-size: 15px; }
+.work .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+.price { font-family: var(--font-mono); font-weight: 700; font-size: 16px; font-variant-numeric: tabular-nums; }
+.dim { color: var(--muted); }
+
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.two > * { min-width: 0; }
+.prose p { color: var(--muted); max-width: 54ch; }
+.prose p + p { margin-top: 14px; }
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 44px 1fr; gap: 4px 12px; padding-block: 16px; border-top: 1px solid var(--line); }
+.steps li::before { content: counter(s, decimal-leading-zero); font-family: var(--font-mono); color: var(--accent); font-size: 14px; padding-top: 3px; }
+.steps b { display: block; font-family: var(--font-display); font-size: 19px; }
+.steps span { color: var(--muted); font-size: 15px; }
+
+form { display: grid; gap: 14px; background: var(--surface); padding: 24px; border-radius: 6px; }
+form h3 { font-size: 22px; font-weight: 700; }
+label { font-size: 14px; font-weight: 700; display: grid; gap: 6px; }
+input, textarea, select {
+  font: 400 16px var(--font-body); color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 4px; padding: 11px 12px; width: 100%;
+}
+textarea { min-height: 110px; resize: vertical; }
+form button { justify-self: start; }
+.note { padding: 12px 14px; border: 1px solid var(--accent); border-radius: 4px; background: var(--bg); font-size: 15px; }
+
+.contact-list { display: grid; gap: 14px; margin-top: 20px; }
+.contact-list div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding-block: 12px; border-top: 1px solid var(--line); }
+.contact-list .k { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); min-width: 64px; }
+.contact-list .v { font-weight: 500; user-select: all; overflow-wrap: anywhere; }
+.copy { font: 500 13px var(--font-body); background: transparent; color: var(--fg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 10px; cursor: pointer; }
+
+footer { padding-top: 28px; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
+
+@media (max-width: 760px) {
+  .hero, .two { grid-template-columns: 1fr; gap: 36px; }
+  .hero { padding-block: 16px 48px; }
+  section { padding-block: 48px; }
+  form { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <a class="brand" href="#top">My Public Space</a>
+    <nav aria-label="Main">
+      <a href="#works">Works</a>
+      <a href="#artists">For artists</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <p class="eyebrow">Original works and limited prints</p>
+        <h1>Art you can live with.</h1>
+        <p class="lede">My Public Space is an online gallery where independent artists show and sell their work. Browse, ask about a piece, or send us your own.</p>
+        <div class="actions">
+          <a class="btn primary" href="#works">Browse the works</a>
+          <a class="btn ghost" href="#artists">Submit your art</a>
+        </div>
+      </div>
+      <div class="stack" id="hero-stack" aria-hidden="true"></div>
+    </div>
+  </main>
+
+  <section id="works">
+    <div class="head">
+      <div>
+        <p class="eyebrow">Current selection</p>
+        <h2>On the wall now</h2>
+      </div>
+      <p>Each piece is original or a numbered edition. Prices are in euros. Use the button to ask about a work.</p>
+    </div>
+    <div class="works" id="works-grid"></div>
+  </section>
+
+  <section id="artists">
+    <div class="head">
+      <div>
+        <p class="eyebrow">Open call</p>
+        <h2>Artists, send us your work</h2>
+      </div>
+      <p>We welcome painters, printmakers, illustrators, photographers and mixed-media artists, emerging or established.</p>
+    </div>
+    <div class="two">
+      <ol class="steps">
+        <li><div><b>Send your submission</b><span>Share a link to your portfolio and a short note about your work.</span></div></li>
+        <li><div><b>We take a look</b><span>We review every submission and reply to each artist.</span></div></li>
+        <li><div><b>Agree on terms</b><span>Prices and conditions are agreed with you directly before anything goes online.</span></div></li>
+        <li><div><b>Your work goes on show</b><span>We list it with your name, a description and the details of the piece.</span></div></li>
+      </ol>
+      <form id="submit-form" novalidate>
+        <h3>Submit your work</h3>
+        <label for="s-name">Name
+          <input id="s-name" name="name" type="text" autocomplete="name" required>
+        </label>
+        <label for="s-email">Email
+          <input id="s-email" name="email" type="email" autocomplete="email" required>
+        </label>
+        <label for="s-link">Portfolio or website link
+          <input id="s-link" name="link" type="url" placeholder="https://" required>
+        </label>
+        <label for="s-medium">Main medium
+          <select id="s-medium" name="medium">
+            <option>Painting</option>
+            <option>Drawing or illustration</option>
+            <option>Print</option>
+            <option>Photography</option>
+            <option>Sculpture or ceramics</option>
+            <option>Mixed media</option>
+          </select>
+        </label>
+        <label for="s-msg">About your work
+          <textarea id="s-msg" name="message" required></textarea>
+        </label>
+        <button class="btn primary" type="submit">Send submission</button>
+        <p class="note" role="status" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="two">
+      <div class="head" style="margin-bottom:0">
+        <div>
+          <p class="eyebrow">About</p>
+          <h2>A public space for art</h2>
+        </div>
+      </div>
+      <div class="prose">
+        <p>The idea is simple: art should be easy to find, easy to buy and fair to the people who make it. My Public Space shows a small, carefully chosen selection instead of an endless catalogue.</p>
+        <p>Every work is described honestly, with its medium, size and edition. If you want to know more about a piece or an artist, write to us and we will answer personally.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="head">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2>Ask about a work</h2>
+      </div>
+      <p>Interested in a piece, or have a question about buying? Write to us and we will get back to you.</p>
+    </div>
+    <div class="two">
+      <div>
+        <div class="contact-list">
+          <div><span class="k">Email</span><span class="v" id="c-email">x374204115@gmail.com</span><button class="copy" type="button" data-copy="c-email">Copy</button></div>
+          <div><span class="k">Phone</span><span class="v" id="c-phone">+39 348 030 4908</span><button class="copy" type="button" data-copy="c-phone">Copy</button></div>
+        </div>
+      </div>
+      <form id="enquiry-form" novalidate>
+        <h3>Send an enquiry</h3>
+        <label for="e-name">Name
+          <input id="e-name" name="name" type="text" autocomplete="name" required>
+        </label>
+        <label for="e-email">Email
+          <input id="e-email" name="email" type="email" autocomplete="email" required>
+        </label>
+        <label for="e-msg">Message
+          <textarea id="e-msg" name="message" required></textarea>
+        </label>
+        <button class="btn primary" type="submit">Send enquiry</button>
+        <p class="note" role="status" hidden></p>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <span>&copy; 2026 My Public Space</span>
+    <span>Sample artworks shown. Replace with real pieces.</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  /* ---- Artwork covers drawn as SVG (sample pieces) ---- */
+  function rng(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function terrazzo() {
+    var r = rng(42), cols = ['#d9534f', '#2f6f73', '#e8b04b', '#3a3a46', '#f2efe6', '#8fb3a1'], out = '<rect width="100" height="125" fill="#ece5d6"/>';
+    for (var i = 0; i < 70; i++) {
+      var x = r() * 100, y = r() * 125, n = 4 + Math.floor(r() * 2), rad = 3 + r() * 8, rot = r() * 6.28, pts = [];
+      for (var k = 0; k < n; k++) { var a = rot + k * 6.28 / n + r() * 0.6; pts.push((x + Math.cos(a) * rad).toFixed(1) + ',' + (y + Math.sin(a) * rad * (0.6 + r() * 0.5)).toFixed(1)); }
+      out += '<polygon points="' + pts.join(' ') + '" fill="' + cols[Math.floor(r() * cols.length)] + '"/>';
+    }
+    return out;
+  }
+  var covers = {
+    tide: '<rect width="100" height="125" fill="#ead9b6"/><circle cx="68" cy="38" r="15" fill="#e4733f"/><rect y="62" width="100" height="63" fill="#2b4f7d"/><path d="M0 74 Q12 68 25 74 T50 74 T75 74 T100 74 V84 H0Z" fill="#3d6aa0"/><path d="M0 92 Q12 86 25 92 T50 92 T75 92 T100 92 V102 H0Z" fill="#274a78"/><path d="M0 110 Q12 104 25 110 T50 110 T75 110 T100 110 V125 H0Z" fill="#1d3a60"/>',
+    bus: '<rect width="100" height="125" fill="#1b1f3b"/><rect x="12" y="18" width="76" height="70" rx="6" fill="#262c52"/><g fill="#f3d36b"><rect x="18" y="26" width="14" height="10"/><rect x="36" y="26" width="14" height="10"/><rect x="54" y="26" width="14" height="10" opacity=".5"/><rect x="72" y="26" width="10" height="10"/><rect x="18" y="42" width="14" height="10" opacity=".5"/><rect x="36" y="42" width="14" height="10"/><rect x="54" y="42" width="14" height="10"/><rect x="72" y="42" width="10" height="10" opacity=".5"/></g><circle cx="30" cy="72" r="9" fill="#e4573d"/><rect x="0" y="100" width="100" height="25" fill="#10132a"/><path d="M0 100 L100 92" stroke="#f3d36b" stroke-width="1.5"/>',
+    terrazzo: terrazzo(),
+    salt: '<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0b9a2"/><stop offset="1" stop-color="#fbe8d3"/></linearGradient></defs><rect width="100" height="125" fill="url(#sk)"/><rect y="74" width="100" height="51" fill="#f8f4ea"/><line x1="0" y1="74" x2="100" y2="74" stroke="#d9c8b4" stroke-width=".6"/><path d="M0 125 L50 80 L100 125" fill="none" stroke="#e8dfce" stroke-width=".8"/><path d="M20 125 L50 80 L80 125" fill="none" stroke="#e8dfce" stroke-width=".8"/><rect x="48.6" y="66" width="2.6" height="8" fill="#2c2a33"/><circle cx="49.9" cy="64.6" r="1.6" fill="#2c2a33"/>',
+    kitchen: '<rect width="100" height="125" fill="#cfe0d4"/><rect x="58" y="14" width="30" height="40" fill="#f6f1e4"/><path d="M73 14 V54 M58 34 H88" stroke="#7d9a88" stroke-width="2"/><rect y="86" width="100" height="39" fill="#8a6a4a"/><rect y="86" width="100" height="3" fill="#6f5238"/><rect x="24" y="62" width="22" height="26" rx="4" fill="#d5573a"/><rect x="28" y="54" width="14" height="10" fill="#d5573a"/><ellipse cx="35" cy="54" rx="7" ry="2.4" fill="#b94528"/>',
+    thread: '<rect width="100" height="125" fill="#e9e4d8"/><g transform="rotate(-8 30 40)"><rect x="12" y="22" width="34" height="28" fill="#2f4858"/></g><g transform="rotate(10 70 60)"><rect x="52" y="48" width="30" height="36" fill="#f0c75e"/></g><g transform="rotate(-4 40 95)"><rect x="22" y="82" width="38" height="24" fill="#8fb3a1"/></g><path d="M-4 20 C30 10 40 70 55 62 S85 100 104 96" fill="none" stroke="#d4271e" stroke-width="2.2"/>'
+  };
+  function svg(key) { return '<svg viewBox="0 0 100 125" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Artwork cover">' + covers[key] + '</svg>'; }
+
+  var works = [
+    { no: '001', t: 'Low Tide, Variation 3', a: 'Giulia R.', m: 'Acrylic on canvas', d: '70 × 90 cm', p: '€420', k: 'tide' },
+    { no: '002', t: 'Night Bus Window', a: 'Marco T.', m: 'Risograph print, edition of 30', d: '30 × 42 cm', p: '€65', k: 'bus' },
+    { no: '003', t: 'Terrazzo Study', a: 'Sofia L.', m: 'Ink on paper', d: '40 × 50 cm', p: '€180', k: 'terrazzo' },
+    { no: '004', t: 'Salt Flat Horizon', a: 'Luca B.', m: 'Oil on panel', d: '50 × 50 cm', p: '€560', k: 'salt' },
+    { no: '005', t: 'Quiet Kitchen', a: 'Anna M.', m: 'Giclée print, edition of 50', d: '50 × 70 cm', p: '€90', k: 'kitchen' },
+    { no: '006', t: 'Red Thread', a: 'Dario C.', m: 'Collage on board', d: '35 × 45 cm', p: '€240', k: 'thread' }
+  ];
+
+  document.getElementById('hero-stack').innerHTML =
+    '<div class="art">' + svg('tide') + '</div><div class="art">' + svg('salt') + '</div><div class="art">' + svg('thread') + '</div>';
+
+  var grid = document.getElementById('works-grid');
+  grid.innerHTML = works.map(function (w) {
+    return '<article class="work"><div class="art">' + svg(w.k) + '</div>' +
+      '<div class="meta"><span class="mono dim">No. ' + w.no + '</span><h3>' + w.t + '</h3>' +
+      '<p class="by">' + w.a + '</p><p class="mono dim">' + w.m + ' · ' + w.d + '</p>' +
+      '<div class="row"><span class="price">' + w.p + '</span>' +
+      '<a class="btn ghost small" href="#contact" data-piece="' + w.t + ' by ' + w.a + '">Ask about this</a></div></div></article>';
+  }).join('');
+
+  grid.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-piece]');
+    if (!a) return;
+    var msg = document.getElementById('e-msg');
+    msg.value = 'Hello, I am interested in “' + a.getAttribute('data-piece') + '”. Could you tell me more about it?';
+  });
+
+  /* ---- Demo forms: no server, so nothing is sent ---- */
+  function wire(id, text) {
+    var f = document.getElementById(id), n = f.querySelector('.note');
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      n.hidden = false;
+      var ok = true;
+      Array.prototype.forEach.call(f.querySelectorAll('[required]'), function (el) { if (!el.value.trim()) ok = false; });
+      var em = f.querySelector('input[type="email"]');
+      if (em && em.value.indexOf('@') < 1) ok = false;
+      n.textContent = ok ? text : 'Please fill in every field, with a valid email address.';
+    });
+  }
+  wire('submit-form', 'Demo form: nothing was sent. Connect a form service on the live site to receive submissions.');
+  wire('enquiry-form', 'Demo form: nothing was sent. Connect a form service on the live site to receive enquiries.');
+
+  /* ---- Copy buttons ---- */
+  Array.prototype.forEach.call(document.querySelectorAll('.copy'), function (b) {
+    b.addEventListener('click', function () {
+      var el = document.getElementById(b.getAttribute('data-copy'));
+      function done() { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); }
+      function sel() { var r = document.createRange(); r.selectNodeContents(el); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+      try { navigator.clipboard.writeText(el.textContent).then(done, sel); } catch (err) { sel(); }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
